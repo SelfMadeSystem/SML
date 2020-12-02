@@ -1,5 +1,6 @@
 package uwu.smsgamer.sml.parser;
 
+import org.jetbrains.annotations.NotNull;
 import uwu.smsgamer.sml.exceptions.SMLParseException;
 import uwu.smsgamer.sml.map.*;
 import uwu.smsgamer.sml.map.values.*;
@@ -10,14 +11,14 @@ import java.nio.file.Files;
 import java.util.stream.Stream;
 
 public class SMLParser {
-    public static SMLMap parse(final File file) throws IOException, SMLParseException {
+    public static SMLMap parse(@NotNull final File file) throws IOException, SMLParseException {
         final StringBuilder contentBuilder = new StringBuilder();
         final Stream<String> stream = Files.lines(file.toPath(), StandardCharsets.UTF_8);
         stream.forEach(s -> contentBuilder.append(s).append("\n"));
         return parse(contentBuilder.toString());
     }
 
-    public static SMLMap parse(final String text) throws SMLParseException {
+    public static SMLMap parse(@NotNull final String text) throws SMLParseException {
         return new SMLParser(new BufferedChars(text)).parse();
     }
 
@@ -47,6 +48,7 @@ public class SMLParser {
         }
     }
 
+    @NotNull
     private SMLNode parseNode() throws SMLParseException {
         if (bufferedChars.get() != ':') expected(":", String.valueOf(bufferedChars.get()));
         final StringBuilder name = new StringBuilder();
@@ -67,6 +69,7 @@ public class SMLParser {
         return n;
     }
 
+    @NotNull
     private SMLValue parseValue() throws SMLParseException {
         final char c = bufferedChars.get();
         if (c == ':') {
@@ -106,6 +109,7 @@ public class SMLParser {
         return SMLNull.getInstance();
     }
 
+    @NotNull
     private SMLNum parseNumber() throws SMLParseException {
         final String s = parseString(')')[0];
         if (s.equals("0")) return new SMLNum(0);
@@ -114,6 +118,7 @@ public class SMLParser {
         else return new SMLNum(Double.parseDouble(s));
     }
 
+    @NotNull
     private String[] parseString(char endChar) throws SMLParseException {
         final StringBuilder s = new StringBuilder();
         final StringBuilder s1 = new StringBuilder();
@@ -135,6 +140,7 @@ public class SMLParser {
         return new String[]{s.toString(), s1.toString()};
     }
 
+    @NotNull
     private char[] getChar() throws SMLParseException {
         char c = bufferedChars.next();
         final char[] result = new char[]{'\u0000', c};
@@ -164,22 +170,22 @@ public class SMLParser {
         while (Character.isWhitespace(bufferedChars.next())) continue;
     }
 
-    private void skipToChar(final char c, final String exc) throws SMLParseException {
+    private void skipToChar(final char c, @NotNull final String exc) throws SMLParseException {
         while (bufferedChars.next() != c)
             if (exc.contains(String.valueOf(bufferedChars.get()))) unexpected(bufferedChars.get());
     }
 
-    private void skipToAnyChar(final String s, final String exc) throws SMLParseException {
+    private void skipToAnyChar(@NotNull final String s, @NotNull final String exc) throws SMLParseException {
         while (!s.contains(String.valueOf(bufferedChars.next()))) {
             if (exc.contains(String.valueOf(bufferedChars.get()))) unexpected(bufferedChars.get());
         }
     }
 
-    private void expected(final String s, final String got) throws SMLParseException {
+    private void expected(@NotNull final String s, @NotNull final String got) throws SMLParseException {
         throw SMLParseException.expected(s, got, bufferedChars);
     }
 
-    private void unexpected(final String s) throws SMLParseException {
+    private void unexpected(@NotNull final String s) throws SMLParseException {
         throw SMLParseException.unexpected(s, bufferedChars);
     }
 
