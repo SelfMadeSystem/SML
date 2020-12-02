@@ -10,21 +10,21 @@ import java.nio.file.Files;
 import java.util.stream.Stream;
 
 public class SMLParser {
-    public static SMLMap parse(File file) throws IOException, SMLParseException {
-        StringBuilder contentBuilder = new StringBuilder();
-        Stream<String> stream = Files.lines(file.toPath(), StandardCharsets.UTF_8);
+    public static SMLMap parse(final File file) throws IOException, SMLParseException {
+        final StringBuilder contentBuilder = new StringBuilder();
+        final Stream<String> stream = Files.lines(file.toPath(), StandardCharsets.UTF_8);
         stream.forEach(s -> contentBuilder.append(s).append("\n"));
         return parse(contentBuilder.toString());
     }
 
-    public static SMLMap parse(String text) throws SMLParseException {
+    public static SMLMap parse(final String text) throws SMLParseException {
         return new SMLParser(new BufferedChars(text)).parse();
     }
 
     private final BufferedChars bufferedChars;
     private final SMLMap map = new SMLMap();
 
-    public SMLParser(BufferedChars bufferedChars) {
+    public SMLParser(final BufferedChars bufferedChars) {
         this.bufferedChars = bufferedChars;
     }
 
@@ -49,7 +49,7 @@ public class SMLParser {
 
     private SMLNode parseNode() throws SMLParseException {
         if (bufferedChars.get() != ':') expected(":", String.valueOf(bufferedChars.get()));
-        StringBuilder name = new StringBuilder();
+        final StringBuilder name = new StringBuilder();
         while (bufferedChars.next() != ':' &&
           bufferedChars.get() != '{' &&
           bufferedChars.get() != '}' &&
@@ -61,18 +61,18 @@ public class SMLParser {
           bufferedChars.get() != ']') name.append(bufferedChars.get());
         char c = bufferedChars.get();
         if (c == '}' || c == ')' || c == ']') unexpected(c);
-        SMLNode n = new SMLNode(name.toString());
+        final SMLNode n = new SMLNode(name.toString());
         n.value = parseValue();
         bufferedChars.next();
         return n;
     }
 
     private SMLValue parseValue() throws SMLParseException {
-        char c = bufferedChars.get();
+        final char c = bufferedChars.get();
         if (c == ':') {
             return SMLNull.getInstance();
         } else if (c == '"' || c == '\'') {
-            String[] s = parseString(c);
+            final String[] s = parseString(c);
             return new SMLString(s[0], s[1]);
         } else if (c == '(') {
             if (bufferedChars.peek(1) == 't') {
@@ -85,7 +85,7 @@ public class SMLParser {
                 return parseNumber();
             }
         } else if (c == '{') {
-            SMLObject obj = new SMLObject();
+            final SMLObject obj = new SMLObject();
             skipWhitespaces();
             while (bufferedChars.get() != '}') {
                 SMLNode node = parseNode();
@@ -95,7 +95,7 @@ public class SMLParser {
             return obj;
         } else if (c == '[') {
             skipToAnyChar("{}()[]\"'", "");
-            SMLArray arr = new SMLArray();
+            final SMLArray arr = new SMLArray();
             while (bufferedChars.get() != ']') {
                 arr.add(parseValue());
                 skipToAnyChar("{}()[]\"'", "");
@@ -107,7 +107,7 @@ public class SMLParser {
     }
 
     private SMLNum parseNumber() throws SMLParseException {
-        String s = parseString(')')[0];
+        final String s = parseString(')')[0];
         if (s.equals("0")) return new SMLNum(0);
         else if (s.startsWith("0x")) return new SMLNum(Integer.parseInt(s.substring(2), 16));
         else if (s.startsWith("0b")) return new SMLNum(Integer.parseInt(s.substring(2), 2));
@@ -115,15 +115,15 @@ public class SMLParser {
     }
 
     private String[] parseString(char endChar) throws SMLParseException {
-        StringBuilder s = new StringBuilder();
-        StringBuilder s1 = new StringBuilder();
+        final StringBuilder s = new StringBuilder();
+        final StringBuilder s1 = new StringBuilder();
         while (bufferedChars.next() != endChar) {
             s1.append(bufferedChars.get());
             if (bufferedChars.get() == '\\') {
                 if (bufferedChars.peek(1) != '\n') {
-                    char[] chars = getChar();
-                    char[] cs = new char[chars.length-1];
-                    System.arraycopy(chars, 1, cs, 0, chars.length-1);
+                    final char[] chars = getChar();
+                    final char[] cs = new char[chars.length - 1];
+                    System.arraycopy(chars, 1, cs, 0, chars.length - 1);
                     s.append(chars[0]);
                     s1.append(cs);
                 } else {
@@ -137,7 +137,7 @@ public class SMLParser {
 
     private char[] getChar() throws SMLParseException {
         char c = bufferedChars.next();
-        char[] result = new char[]{'\u0000', c};
+        final char[] result = new char[]{'\u0000', c};
         if (c == '\\') result[0] = '\\';
         else if (c == '"') result[0] = '"';
         else if (c == '\'') result[0] = '\'';
@@ -164,26 +164,26 @@ public class SMLParser {
         while (Character.isWhitespace(bufferedChars.next())) continue;
     }
 
-    private void skipToChar(char c, String exc) throws SMLParseException {
+    private void skipToChar(final char c, final String exc) throws SMLParseException {
         while (bufferedChars.next() != c)
             if (exc.contains(String.valueOf(bufferedChars.get()))) unexpected(bufferedChars.get());
     }
 
-    private void skipToAnyChar(String s, String exc) throws SMLParseException {
+    private void skipToAnyChar(final String s, final String exc) throws SMLParseException {
         while (!s.contains(String.valueOf(bufferedChars.next()))) {
             if (exc.contains(String.valueOf(bufferedChars.get()))) unexpected(bufferedChars.get());
         }
     }
 
-    private void expected(String s, String got) throws SMLParseException {
+    private void expected(final String s, final String got) throws SMLParseException {
         throw SMLParseException.expected(s, got, bufferedChars);
     }
 
-    private void unexpected(String s) throws SMLParseException {
+    private void unexpected(final String s) throws SMLParseException {
         throw SMLParseException.unexpected(s, bufferedChars);
     }
 
-    private void unexpected(char c) throws SMLParseException {
+    private void unexpected(final char c) throws SMLParseException {
         unexpected(String.valueOf(c));
     }
 }

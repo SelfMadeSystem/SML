@@ -22,11 +22,11 @@ public class SMLParseException extends Exception {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public static SMLParseException expected(String s, String got, BufferedChars bc) {
+    public static SMLParseException expected(final String s, final String got, final BufferedChars bc) {
         return new SMLParseException('"' + s + "\" expected at [" + bc.getLine() + ':' + bc.getCol() + "]. Got: " + got);
     }
 
-    public static SMLParseException unexpected(String s, BufferedChars bc) {
+    public static SMLParseException unexpected(final String s, final BufferedChars bc) {
         return new SMLParseException("Unexpected token \"" + s + "\" at [" + bc.getLine() + ':' + bc.getCol() + "].");
     }
 }
