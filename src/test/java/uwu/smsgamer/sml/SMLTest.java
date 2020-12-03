@@ -7,13 +7,20 @@ import uwu.smsgamer.sml.map.values.*;
 import uwu.smsgamer.sml.parser.SMLParser;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.stream.Stream;
 
 public class SMLTest {
     private static final File TEST_FILE = new File("run/test.sml");
-    private static final File LONG_FILE = new File("run/long.sml");
+    private static final char[] chars = new char[]{
+      '\\',
+      '\'',
+      '"',
+      'b',
+      'f',
+      'n',
+      'r',
+      't'
+    };
+
     @Test
     public void fileTest() throws Exception {
         File file = TEST_FILE;
@@ -66,21 +73,43 @@ public class SMLTest {
 
     @Test
     public void timingTest() throws Exception {
-        synchronized(this) {
-            final StringBuilder contentBuilder = new StringBuilder();
-            final Stream<String> stream = Files.lines(LONG_FILE.toPath(), StandardCharsets.UTF_8);
-            stream.forEach(s -> contentBuilder.append(s).append("\n"));
-            long startMs = System.currentTimeMillis();
-            long start = System.nanoTime();
-            SMLParser.parse(contentBuilder.toString());
-            long end = System.nanoTime();
-            long endMs = System.currentTimeMillis();
-            long duration = end - start;
-            long durationMs = endMs - startMs;
-            System.out.println(duration + "  " + durationMs);
-            if (durationMs >= 10 || duration >= 10000000) {
-                throw new Exception("Duration too long :c");
+        synchronized (this) {
+            long avgDuration = -1;
+            long avgDurationMs = -1;
+            for (int i = 0; i < 100; i++) {
+                final StringBuilder contentBuilder = new StringBuilder("{");
+                for (int j = 0; j < 500000; j++) {
+                    if (Math.random() < 0.5)
+                        contentBuilder.append(":nice").append(Math.random()).append("(").append(Math.random()).append("):");
+                    else
+                        contentBuilder.append(":owo").append(Math.random()).append("\"\\")
+                          .append(chars[(int) (chars.length * Math.random())]).append("\":");
+                }
+                contentBuilder.append("}");
+                long startMs = System.currentTimeMillis();
+                long start = System.nanoTime();
+                SMLParser.parse(contentBuilder.toString());
+                long end = System.nanoTime();
+                long endMs = System.currentTimeMillis();
+                long duration = end - start;
+                long durationMs = endMs - startMs;
+                System.out.println("Test #" + i + " Duration: " + duration + "  DurationMS: " + durationMs);
+                if (avgDuration == -1) avgDuration = duration;
+                else avgDuration = (avgDuration + duration) / 2;
+                if (avgDurationMs == -1) avgDurationMs = durationMs;
+                else avgDurationMs = (avgDurationMs + durationMs) / 2;
             }
+            System.out.println("Test Finished. AvgDuration: " + avgDuration + "  AvgDurationMS: " + avgDurationMs);
         }
+    }
+
+    @Test
+    public void aCharTest() {
+
+        char max = '\u0000';
+        for (char c : chars) {
+            max = (char) Math.max(max, c);
+        }
+        System.out.println(max + ":" + ((int) max));
     }
 }

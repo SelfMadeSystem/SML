@@ -8,8 +8,10 @@ import uwu.smsgamer.sml.map.values.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.*;
 import java.util.stream.Stream;
 
+// TODO: 2020-12-03 Improve speed.
 public class SMLParser {
     public static SMLMap parse(@NotNull final File file) throws IOException, SMLParseException {
         final StringBuilder contentBuilder = new StringBuilder();
@@ -151,19 +153,25 @@ public class SMLParser {
         return new String[]{s.toString(), s1.toString()};
     }
 
+    // TODO: 2020-12-03 Probably use a not HashMap
+    private static final Map<Character, Character> charMap = new HashMap<>();
+
+    static {
+        charMap.put('\\', '\\');
+        charMap.put('\'', '\'');
+        charMap.put('"', '"');
+        charMap.put('b', '\b');
+        charMap.put('f', '\f');
+        charMap.put('n', '\n');
+        charMap.put('r', '\r');
+        charMap.put('t', '\t');
+    }
+
     @NotNull
     private char[] getChar() throws SMLParseException {
         char c = bufferedChars.next();
         final char[] result = new char[]{'\u0000', c};
-        if (c == '\\') result[0] = '\\';
-        else if (c == '"') result[0] = '"';
-        else if (c == '\'') result[0] = '\'';
-        else if (c == 'b') result[0] = '\b';
-        else if (c == 'f') result[0] = '\f';
-        else if (c == 'n') result[0] = '\n';
-        else if (c == 'r') result[0] = '\r';
-        else if (c == 't') result[0] = '\t';
-        else if (c == 'u') {
+        if (c == 'u') {
             int codePoint = 0;
             for (int i = 0; i < 4; i++) {
                 c = bufferedChars.next();
@@ -172,7 +180,11 @@ public class SMLParser {
                 else if (c >= 'A' && c <= 'F') codePoint += c - 'A' + 0xA;
             }
             result[0] = (char) codePoint;
-        } else unexpected(c);
+        } else {
+            Character ch = charMap.get(c);
+            if (ch == null) unexpected(c);
+            else result[0] = ch;
+        }
         return result;
     }
 
