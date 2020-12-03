@@ -15,6 +15,25 @@ public class SMLObject extends SMLIndentable {
         this.values = values;
     }
 
+    public SMLValue set(String s, SMLValue value) {
+        String[] split = s.split(":");
+        String last = split[split.length - 1];
+        SMLObject object = this;
+        for (int i = 0; i < split.length - 1; i++) {
+            String name = split[i];
+            SMLValue v = object.get(name);
+            if (v == null) {
+                object = (SMLObject) object.add(new SMLNode(name, new SMLObject()));
+            } else if (v instanceof SMLObject) {
+                object = (SMLObject) v;
+            } else throw new IllegalArgumentException("Not an SMLObject: " + name);
+        }
+        SMLNode node = object.values.get(last);
+        if (node == null) object.values.put(last, new SMLNode(last, value));
+        else node.value = value;
+        return value;
+    }
+
     public SMLValue add(SMLNode value) {
         this.values.put(value.name, value);
         return value.value;
@@ -24,13 +43,16 @@ public class SMLObject extends SMLIndentable {
         String[] split = s.split(":");
         SMLObject object = this;
         for (int i = 0; i < split.length - 1; i++) {
-            String s1 = split[i];
-            SMLValue v = object.get(s1);
-            if (v instanceof SMLObject) {
+            String name = split[i];
+            SMLValue v = object.get(name);
+            if (v == null) {
+                return null;
+            } else if (v instanceof SMLObject) {
                 object = (SMLObject) v;
-            } else throw new IllegalArgumentException("Not an SMLObject: " + s1);
+            } else throw new IllegalArgumentException("Not an SMLObject: " + name);
         }
-        return object.values.get(split[split.length - 1]).value;
+        SMLNode node = object.values.get(split[split.length - 1]);
+        return node == null ? null : node.value;
     }
 
     @Override

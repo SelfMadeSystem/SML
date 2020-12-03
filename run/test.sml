@@ -2,10 +2,10 @@
     :Keys without a value are considered as comments.
 
     Comments can also have new lines in them.:
-    :int(3):
-    :decimal(3.0):
-    :hex(0x3):
-    :bin(0b11):
+    :int(10):
+    :decimal(10.1):
+    :hex(0x10):
+    :bin(0b10):
     :text"Test owo uwu":
     :object{
         :booleanF(false):

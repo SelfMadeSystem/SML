@@ -11,7 +11,7 @@ public class SMLNull extends SMLValue {
 
     @Override
     public String toString() {
-        return "";
+        return "null";
     }
 
     @Override
@@ -21,6 +21,11 @@ public class SMLNull extends SMLValue {
 
     @Override
     public String endString() {
+        return "";
+    }
+
+    @Override
+    public String completeString() {
         return "";
     }
 }
