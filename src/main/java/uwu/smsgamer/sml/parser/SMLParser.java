@@ -31,7 +31,18 @@ public class SMLParser {
 
     public SMLMap parse() throws SMLParseException {
         try {
+            StringBuilder startComments = new StringBuilder();
+            while (bufferedChars.get() != '{') {
+                startComments.append(bufferedChars.get());
+                bufferedChars.next();
+            }
             startingParse();
+            StringBuilder endComments = new StringBuilder();
+            while (bufferedChars.hasNext()) {
+                endComments.append(bufferedChars.next());
+            }
+            map.startComments = startComments.toString();
+            map.endComments = endComments.toString();
         } catch (IndexOutOfBoundsException e) {
             throw new SMLParseException("Ended unexpectedly.", e);
         }

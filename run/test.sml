@@ -1,3 +1,4 @@
+You can have comments at the beginning and end of the file.
 {
     :Keys without a value are considered as comments.
 
@@ -27,3 +28,4 @@ this is though. \" a":
         ]:
     }:
 }
+These beginning and end comments save in the map but shouldn't be used.

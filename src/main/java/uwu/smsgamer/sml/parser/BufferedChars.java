@@ -29,7 +29,7 @@ public class BufferedChars {
     }
 
     public boolean hasNext() {
-        return at < chars.length();
+        return at < chars.length()-1;
     }
 
     public CharSequence getChars() {

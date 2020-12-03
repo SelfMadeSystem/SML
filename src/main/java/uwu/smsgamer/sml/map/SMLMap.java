@@ -7,10 +7,12 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public class SMLMap {
+    public String startComments = "";
+    public String endComments = "";
     public ParentNode parentNode = new ParentNode();
 
     public String toString() {
-        return parentNode.toString(1);
+        return startComments + parentNode.toString(1) + endComments;
     }
 
     public SMLValue getValue(String s) {
