@@ -14,7 +14,9 @@ You can have comments at the beginning and end of the file.
         :string"This is a string.\nnew line \n\ttabbed\
 aha not on new line\'
 
-this is though. \" a":
+this is though. \" a
+\u00A7 owo
+":
         :obj{
             :cool(17):
         }:

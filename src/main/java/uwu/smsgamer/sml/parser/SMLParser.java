@@ -170,14 +170,17 @@ public class SMLParser {
     @NotNull
     private char[] getChar() throws SMLParseException {
         char c = bufferedChars.next();
-        final char[] result = new char[]{'\u0000', c};
+        char[] result = new char[]{'\u0000', c};
         if (c == 'u') {
             int codePoint = 0;
+            result = new char[]{'\u0000', c, bufferedChars.peek(1), bufferedChars.peek(2), bufferedChars.peek(3), bufferedChars.peek(4),};
             for (int i = 0; i < 4; i++) {
                 c = bufferedChars.next();
-                if (c >= '0' && c <= '9') codePoint += c - '0';
-                else if (c >= 'a' && c <= 'f') codePoint += c - 'a' + 0xA;
-                else if (c >= 'A' && c <= 'F') codePoint += c - 'A' + 0xA;
+                int m = (int) Math.pow(16, 3 - i);
+                if (c >= '0' && c <= '9') codePoint += (c - '0') * m;
+                else if (c >= 'a' && c <= 'f') codePoint += (c - 'a' + 0xA) * m;
+                else if (c >= 'A' && c <= 'F') codePoint += (c - 'A' + 0xA) * m;
+                else unexpected(c);
             }
             result[0] = (char) codePoint;
         } else {

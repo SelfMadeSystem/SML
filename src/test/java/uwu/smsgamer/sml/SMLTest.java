@@ -102,14 +102,4 @@ public class SMLTest {
             System.out.println("Test Finished. AvgDuration: " + avgDuration + "  AvgDurationMS: " + avgDurationMs);
         }
     }
-
-    @Test
-    public void aCharTest() {
-
-        char max = '\u0000';
-        for (char c : chars) {
-            max = (char) Math.max(max, c);
-        }
-        System.out.println(max + ":" + ((int) max));
-    }
 }
