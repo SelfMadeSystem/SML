@@ -8,10 +8,8 @@ import uwu.smsgamer.sml.map.values.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
 import java.util.stream.Stream;
 
-// TODO: 2020-12-03 Improve speed.
 public class SMLParser {
     public static SMLMap parse(@NotNull final File file) throws IOException, SMLParseException {
         final StringBuilder contentBuilder = new StringBuilder();
@@ -157,14 +155,22 @@ public class SMLParser {
     private char[] getChar() throws SMLParseException {
         char c = bufferedChars.next();
         switch (c) {
-            case '\\': return new char[]{'\\', c};
-            case '\'': return new char[]{'\'', c};
-            case '"': return new char[]{'\"', c};
-            case 'b': return new char[]{'\b', c};
-            case 'f': return new char[]{'\f', c};
-            case 'n': return new char[]{'\n', c};
-            case 'r': return new char[]{'\r', c};
-            case 't': return new char[]{'\t', c};
+            case '\\':
+                return new char[]{'\\', c};
+            case '\'':
+                return new char[]{'\'', c};
+            case '"':
+                return new char[]{'\"', c};
+            case 'b':
+                return new char[]{'\b', c};
+            case 'f':
+                return new char[]{'\f', c};
+            case 'n':
+                return new char[]{'\n', c};
+            case 'r':
+                return new char[]{'\r', c};
+            case 't':
+                return new char[]{'\t', c};
             case 'u':
                 int codePoint = 0;
                 char[] result = new char[]{'\u0000', c, bufferedChars.peek(1), bufferedChars.peek(2), bufferedChars.peek(3), bufferedChars.peek(4),};
