@@ -153,42 +153,35 @@ public class SMLParser {
         return new String[]{s.toString(), s1.toString()};
     }
 
-    // TODO: 2020-12-03 Probably use a not HashMap
-    private static final Map<Character, Character> charMap = new HashMap<>();
-
-    static {
-        charMap.put('\\', '\\');
-        charMap.put('\'', '\'');
-        charMap.put('"', '"');
-        charMap.put('b', '\b');
-        charMap.put('f', '\f');
-        charMap.put('n', '\n');
-        charMap.put('r', '\r');
-        charMap.put('t', '\t');
-    }
-
     @NotNull
     private char[] getChar() throws SMLParseException {
         char c = bufferedChars.next();
-        char[] result = new char[]{'\u0000', c};
-        if (c == 'u') {
-            int codePoint = 0;
-            result = new char[]{'\u0000', c, bufferedChars.peek(1), bufferedChars.peek(2), bufferedChars.peek(3), bufferedChars.peek(4),};
-            for (int i = 0; i < 4; i++) {
-                c = bufferedChars.next();
-                int m = (int) Math.pow(16, 3 - i);
-                if (c >= '0' && c <= '9') codePoint += (c - '0') * m;
-                else if (c >= 'a' && c <= 'f') codePoint += (c - 'a' + 0xA) * m;
-                else if (c >= 'A' && c <= 'F') codePoint += (c - 'A' + 0xA) * m;
-                else unexpected(c);
-            }
-            result[0] = (char) codePoint;
-        } else {
-            Character ch = charMap.get(c);
-            if (ch == null) unexpected(c);
-            else result[0] = ch;
+        switch (c) {
+            case '\\': return new char[]{'\\', c};
+            case '\'': return new char[]{'\'', c};
+            case '"': return new char[]{'\"', c};
+            case 'b': return new char[]{'\b', c};
+            case 'f': return new char[]{'\f', c};
+            case 'n': return new char[]{'\n', c};
+            case 'r': return new char[]{'\r', c};
+            case 't': return new char[]{'\t', c};
+            case 'u':
+                int codePoint = 0;
+                char[] result = new char[]{'\u0000', c, bufferedChars.peek(1), bufferedChars.peek(2), bufferedChars.peek(3), bufferedChars.peek(4),};
+                for (int i = 0; i < 4; i++) {
+                    c = bufferedChars.next();
+                    int m = (int) Math.pow(16, 3 - i);
+                    if (c >= '0' && c <= '9') codePoint += (c - '0') * m;
+                    else if (c >= 'a' && c <= 'f') codePoint += (c - 'a' + 0xA) * m;
+                    else if (c >= 'A' && c <= 'F') codePoint += (c - 'A' + 0xA) * m;
+                    else unexpected(c);
+                }
+                result[0] = (char) codePoint;
+                return result;
+            default:
+                unexpected(c);
         }
-        return result;
+        return new char[0];
     }
 
     @SuppressWarnings("UnnecessaryContinue")
